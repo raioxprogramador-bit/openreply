@@ -16,7 +16,20 @@ export function withZernioManagement(handler: (context: WorkspaceContext, reques
       if (!canManageWorkspace(context.role)) throw new ConnectionError('Only workspace owners and admins can manage the Zernio connection.', 403);
       if (request.method !== 'GET') {
         const origin = request.headers.get('origin');
-        if (origin && origin !== new URL(request.url).origin) throw new ConnectionError('Invalid request origin.', 403);
+        if (origin) {
+          const requestOrigin = new URL(request.url).origin;
+          const nextAuthOrigin = process.env.NEXTAUTH_URL ? new URL(process.env.NEXTAUTH_URL).origin : null;
+          const appUrlOrigin = process.env.NEXT_PUBLIC_APP_URL ? new URL(process.env.NEXT_PUBLIC_APP_URL).origin : null;
+
+          const isAllowed = 
+            origin === requestOrigin ||
+            (nextAuthOrigin && origin === nextAuthOrigin) ||
+            (appUrlOrigin && origin === appUrlOrigin);
+
+          if (!isAllowed) {
+            throw new ConnectionError('Invalid request origin.', 403);
+          }
+        }
       }
       return await handler(context, request);
     } catch (error) {
