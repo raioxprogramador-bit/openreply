@@ -1,7 +1,11 @@
 import { prisma } from '@/lib/db/client';
 import { buildInitialCampaignLinks, syncCampaignLinks } from '@/lib/campaigns/links';
 import { generateReportShareSlug } from '@/lib/reports/share';
-import { calculateCtr, countUniqueClicksBy } from '@/lib/tracking/analytics';
+import {
+  CLICK_ROW_SELECT,
+  calculateCtr,
+  countUniqueClicksBy
+} from '@/lib/tracking/analytics';
 import { z } from 'zod';
 
 export const RXDD_PUBLICATION_GOAL_PREFIX = 'rxdd_publicacao_id:';
@@ -218,7 +222,7 @@ export async function rxddAutomationStatus(automationId: string, workspaceId: st
     prisma.dmLog.count({ where: { automationId, status: 'FAILED' } }),
     prisma.linkClick.findMany({
       where: { automationId },
-      select: { automationId: true, recipientHash: true, ipHash: true }
+      select: CLICK_ROW_SELECT
     })
   ]);
 
