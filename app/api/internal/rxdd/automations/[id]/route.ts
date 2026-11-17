@@ -17,8 +17,9 @@ export async function GET(
   }
 
   const { id } = await context.params;
-  const workspaceId = request.nextUrl.searchParams.get('workspace_id');
-  const publicacaoId = request.nextUrl.searchParams.get('rxdd_publicacao_id');
+  const { searchParams } = new URL(request.url);
+  const workspaceId = searchParams.get('workspace_id');
+  const publicacaoId = searchParams.get('rxdd_publicacao_id');
   if (!workspaceId || !publicacaoId) {
     return NextResponse.json(
       { success: false, error: 'workspace_id and rxdd_publicacao_id required' },
